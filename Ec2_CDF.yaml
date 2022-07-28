@@ -1,0 +1,65 @@
+Description: This template deploys a EC2-instance with Nginx AMI and security groups
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+    Default: CFN-Shiva
+  VpcID:
+    Description: Please enter the VPC ID
+    Type: String
+    Default: 10.10.0.0/16
+  ImageId:
+    Description: Nginx-AMI
+    Type: String
+    Default: ami-0e53fc7bfc076dd21
+
+  KeyName:
+    Description: for doing ssh to instance
+    Type: String
+    Default: shiva_key
+
+  InstanceType:
+    Description: specify the type of instance
+    Type: String
+    Default: t3.micro
+
+Resources:
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupName: CFN_Shiva
+      GroupDescription: Creating SG using CNF
+      VpcId: vpc-069f162b120db5dec
+      SecurityGroupIngress:
+            - IpProtocol: tcp
+              FromPort: 80
+              ToPort: 80
+              CidrIp: 0.0.0.0/0
+            - IpProtocol: tcp
+              FromPort: 22
+              ToPort: 22
+              CidrIp: 0.0.0.0/0 
+      SecurityGroupEgress:
+            - IpProtocol: tcp
+              FromPort: 80
+              ToPort: 80
+              CidrIp: 0.0.0.0/0
+      Tags:
+            - Key: Name
+              Value: CFN_SG
+          
+  MyNewEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: "ami-0e53fc7bfc076dd21"
+      KeyName: "shiva_key"
+      InstanceType: "t3.micro"
+      SecurityGroupIds:
+          - !GetAtt "EC2SecurityGroup.GroupId"
+      SubnetId: "subnet-0115ae8ebe15e63f8"
+      
+  
+        
+        
